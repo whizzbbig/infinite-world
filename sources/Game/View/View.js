@@ -7,6 +7,7 @@ import Renderer from './Renderer.js'
 import Sky from './Sky.js'
 import Terrains from './Terrains.js'
 import Water from './Water.js'
+import PostProcessing from './PostProcessing.js'
 
 import * as THREE from 'three'
 
@@ -37,6 +38,9 @@ export default class View
         this.chunks = new Chunks()
         this.player = new Player()
         this.grass = new Grass()
+
+        // Post-processing (after all scene objects)
+        this.postProcessing = new PostProcessing()
     }
 
     resize()
@@ -45,6 +49,7 @@ export default class View
         this.renderer.resize()
         this.sky.resize()
         this.terrains.resize()
+        this.postProcessing.resize()
     }
 
     update()
@@ -56,10 +61,13 @@ export default class View
         this.player.update()
         this.grass.update()
         this.camera.update()
-        this.renderer.update()
+
+        // Use post-processing render instead of direct render
+        this.postProcessing.render()
     }
 
     destroy()
     {
+        this.postProcessing.destroy()
     }
 }

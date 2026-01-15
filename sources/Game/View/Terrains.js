@@ -43,14 +43,9 @@ export default class Terrains
     {
         this.material = new TerrainMaterial()
         this.material.uniforms.uPlayerPosition.value = new THREE.Vector3()
-        this.material.uniforms.uGradientTexture.value = this.gradient.texture
-        this.material.uniforms.uLightnessSmoothness.value = 0.25
-        this.material.uniforms.uFresnelOffset.value = 0
-        this.material.uniforms.uFresnelScale.value = 0.5
-        this.material.uniforms.uFresnelPower.value = 2
         this.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
         this.material.uniforms.uFogTexture.value = this.sky.customRender.texture
-        this.material.uniforms.uGrassDistance.value = this.state.chunks.minSize
+        this.material.uniforms.uGrassDistance.value = this.state.chunks.minSize * 1.5
 
         this.material.onBeforeRender = (renderer, scene, camera, geometry, mesh) =>
         {
@@ -77,34 +72,6 @@ export default class Terrains
 
         folder
             .add(this.material, 'wireframe')
-
-        folder
-            .add(this.material.uniforms.uLightnessSmoothness, 'value')
-            .min(0)
-            .max(1)
-            .step(0.001)
-            .name('uLightnessSmoothness')
-        
-        folder
-            .add(this.material.uniforms.uFresnelOffset, 'value')
-            .min(- 1)
-            .max(1)
-            .step(0.001)
-            .name('uFresnelOffset')
-        
-        folder
-            .add(this.material.uniforms.uFresnelScale, 'value')
-            .min(0)
-            .max(2)
-            .step(0.001)
-            .name('uFresnelScale')
-        
-        folder
-            .add(this.material.uniforms.uFresnelPower, 'value')
-            .min(1)
-            .max(10)
-            .step(1)
-            .name('uFresnelPower')
     }
 
     update()

@@ -17,8 +17,8 @@ export default class Grass
         this.scene = this.view.scene
         this.noises = this.view.noises
 
-        this.details = 200
-        this.size = this.state.chunks.minSize
+        this.details = 300
+        this.size = this.state.chunks.minSize * 1.5
         this.count = this.details * this.details
         this.fragmentSize = this.size / this.details
         this.bladeWidthRatio = 1.5
@@ -114,9 +114,6 @@ export default class Grass
         this.material.uniforms.uTerrainDTexture.value = null
         this.material.uniforms.uTerrainDOffset.value = new THREE.Vector2()
         this.material.uniforms.uNoiseTexture.value = this.noiseTexture
-        this.material.uniforms.uFresnelOffset.value = 0
-        this.material.uniforms.uFresnelScale.value = 0.5
-        this.material.uniforms.uFresnelPower.value = 2
         this.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
         // this.material.wireframe = true
     }

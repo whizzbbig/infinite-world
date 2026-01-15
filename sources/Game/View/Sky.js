@@ -100,6 +100,7 @@ export default class Sky
 
         // this.sphere.material.wireframe = true
         this.sphere.mesh = new THREE.Mesh(this.sphere.geometry, this.sphere.material)
+        this.sphere.mesh.frustumCulled = false  // Ensure sphere always renders for fog texture
         this.customRender.scene.add(this.sphere.mesh)
     }
 
@@ -245,16 +246,27 @@ export default class Sky
         this.stars.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
         this.stars.material.uniforms.uHeightFragments.value = this.viewport.height * this.viewport.clampedPixelRatio
 
-        // Render in render target
+        // Render sky to fog texture
+        // Sync camera properties for accurate fog sampling
         this.customRender.camera.quaternion.copy(this.view.camera.instance.quaternion)
+        this.customRender.camera.fov = this.view.camera.instance.fov
+        this.customRender.camera.aspect = this.view.camera.instance.aspect
+        this.customRender.camera.updateProjectionMatrix()
+
+        // Clear and render
         this.renderer.instance.setRenderTarget(this.customRender.renderTarget)
+        this.renderer.instance.setClearColor(0x87ceeb, 1)  // Sky blue fallback
+        this.renderer.instance.clear()
         this.renderer.instance.render(this.customRender.scene, this.customRender.camera)
         this.renderer.instance.setRenderTarget(null)
     }
 
     resize()
     {
-        this.customRender.renderTarget.width = this.viewport.width * this.customRender.resolutionRatio
-        this.customRender.renderTarget.height = this.viewport.height * this.customRender.resolutionRatio
+        // Use setSize() to properly resize WebGLRenderTarget
+        this.customRender.renderTarget.setSize(
+            Math.max(1, Math.floor(this.viewport.width * this.customRender.resolutionRatio)),
+            Math.max(1, Math.floor(this.viewport.height * this.customRender.resolutionRatio))
+        )
     }
 }

@@ -9,11 +9,6 @@ export default function TerrainMaterial()
         uniforms:
         {
             uPlayerPosition: { value: null },
-            uGradientTexture: { value: null },
-            uLightnessSmoothness: { value: null },
-            uFresnelOffset: { value: null },
-            uFresnelScale: { value: null },
-            uFresnelPower: { value: null },
             uSunPosition: { value: null },
             uFogTexture: { value: null },
             uGrassDistance: { value: null },
