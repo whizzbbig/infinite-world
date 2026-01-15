@@ -6,6 +6,7 @@ import State from '@/State/State.js'
 import Debug from '@/Debug/Debug.js'
 import NormalsMaterial from './Materials/NormalsMaterial.js'
 import TerrainNormalsMaterial from './Materials/TerrainNormalsMaterial.js'
+import GrassNormalsMaterial from './Materials/GrassNormalsMaterial.js'
 import EdgeCompositeMaterial from './Materials/EdgeCompositeMaterial.js'
 
 export default class PostProcessing {
@@ -69,8 +70,9 @@ export default class PostProcessing {
         // Normals material for player (object type 0.5 = thickness 1.0)
         this.playerNormalsMaterial = new NormalsMaterial(0.5)
 
-        // Normals material for grass (object type 1.0 = thickness 1.0)
-        this.grassNormalsMaterial = new NormalsMaterial(1.0)
+        // Special normals material for grass (uses same vertex positioning as grass shader)
+        // Object type 1.0 = grass (thickness 1.0)
+        this.grassNormalsMaterial = new GrassNormalsMaterial()
 
         // Standard normals material for other meshes (default type 0.5)
         this.normalsMaterial = new NormalsMaterial(0.5)
@@ -83,6 +85,26 @@ export default class PostProcessing {
         this.terrainNormalsMaterial.onBeforeRender = (renderer, scene, camera, geometry, mesh) => {
             this.terrainNormalsMaterial.uniforms.uTexture.value = mesh.userData.texture
             this.terrainNormalsMaterial.uniformsNeedUpdate = true
+        }
+
+        // Set onBeforeRender to copy uniforms from original grass material
+        this.grassNormalsMaterial.onBeforeRender = () => {
+            const grassMaterial = this.view.grass.material
+            this.grassNormalsMaterial.uniforms.uTime.value = grassMaterial.uniforms.uTime.value
+            this.grassNormalsMaterial.uniforms.uGrassDistance.value = grassMaterial.uniforms.uGrassDistance.value
+            this.grassNormalsMaterial.uniforms.uPlayerPosition.value = grassMaterial.uniforms.uPlayerPosition.value
+            this.grassNormalsMaterial.uniforms.uTerrainSize.value = grassMaterial.uniforms.uTerrainSize.value
+            this.grassNormalsMaterial.uniforms.uTerrainTextureSize.value = grassMaterial.uniforms.uTerrainTextureSize.value
+            this.grassNormalsMaterial.uniforms.uTerrainATexture.value = grassMaterial.uniforms.uTerrainATexture.value
+            this.grassNormalsMaterial.uniforms.uTerrainAOffset.value = grassMaterial.uniforms.uTerrainAOffset.value
+            this.grassNormalsMaterial.uniforms.uTerrainBTexture.value = grassMaterial.uniforms.uTerrainBTexture.value
+            this.grassNormalsMaterial.uniforms.uTerrainBOffset.value = grassMaterial.uniforms.uTerrainBOffset.value
+            this.grassNormalsMaterial.uniforms.uTerrainCTexture.value = grassMaterial.uniforms.uTerrainCTexture.value
+            this.grassNormalsMaterial.uniforms.uTerrainCOffset.value = grassMaterial.uniforms.uTerrainCOffset.value
+            this.grassNormalsMaterial.uniforms.uTerrainDTexture.value = grassMaterial.uniforms.uTerrainDTexture.value
+            this.grassNormalsMaterial.uniforms.uTerrainDOffset.value = grassMaterial.uniforms.uTerrainDOffset.value
+            this.grassNormalsMaterial.uniforms.uNoiseTexture.value = grassMaterial.uniforms.uNoiseTexture.value
+            this.grassNormalsMaterial.uniformsNeedUpdate = true
         }
     }
 
@@ -105,7 +127,7 @@ export default class PostProcessing {
         this.compositeMaterial.uniforms.uTerrainThickness.value = 0.4
         this.compositeMaterial.uniforms.uPlayerThickness.value = 0.4
         this.compositeMaterial.uniforms.uGrassThickness.value = 1.0
-        this.compositeMaterial.uniforms.uDepthThreshold.value = 0.002
+        this.compositeMaterial.uniforms.uDepthThreshold.value = 1.0
         this.compositeMaterial.uniforms.uNormalThreshold.value = 0.4
 
         this.compositeMesh = new THREE.Mesh(this.compositeGeometry, this.compositeMaterial)
