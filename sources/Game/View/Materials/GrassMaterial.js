@@ -23,6 +23,7 @@ export default function GrassMaterial()
             uTerrainDOffset: { value: null },
             uNoiseTexture: { value: null },
             uSunPosition: { value: null },
+            uThreeToneTexture: { value: null },
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader

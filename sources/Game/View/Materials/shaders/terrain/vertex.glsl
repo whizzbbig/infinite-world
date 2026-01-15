@@ -5,11 +5,14 @@ uniform sampler2D uTexture;
 uniform sampler2D uFogTexture;
 
 varying vec3 vColor;
+varying float vSunShade;
+varying float vDepth;
+varying vec2 vScreenUv;
 
 #include ../partials/inverseLerp.glsl
 #include ../partials/remap.glsl
-#include ../partials/getFogColor.glsl;
 #include ../partials/getGrassAttenuation.glsl;
+#include ../partials/getSunShade.glsl;
 
 void main()
 {
@@ -38,19 +41,12 @@ void main()
 
     vec3 color = grassColor;
 
-    // Simple toon shading based on slope (consistent day/night)
-    // Flat areas = bright, slopes = darker
-    float slopeFactor = 1.0 - slope;
-
-    // 2-tone toon shading based on slope
-    float toonThreshold = 0.7;
-    vec3 shadedColor = color * 0.7;
-    color = mix(shadedColor, color, step(toonThreshold, slopeFactor));
-
-    // Fog
-    vec2 screenUv = (gl_Position.xy / gl_Position.w * 0.5) + 0.5;
-    color = getFogColor(color, depth, screenUv);
+    // Sun shade for toon shading - passed to fragment
+    float sunShade = getSunShade(normal);
 
     // Varyings
     vColor = color;
+    vSunShade = sunShade;
+    vDepth = depth;
+    vScreenUv = (gl_Position.xy / gl_Position.w * 0.5) + 0.5;
 }

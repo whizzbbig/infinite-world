@@ -20,11 +20,11 @@ attribute vec2 center;
 // attribute float tipness;
 
 varying vec3 vColor;
+varying float vSunShade;
 
 #include ../partials/inverseLerp.glsl
 #include ../partials/remap.glsl
 #include ../partials/getSunShade.glsl;
-#include ../partials/getToonShadeColor.glsl;
 #include ../partials/getGrassAttenuation.glsl;
 #include ../partials/getRotatePivot2d.glsl;
 
@@ -97,9 +97,9 @@ void main()
     vec3 lowColor = mix(uGrassShadedColor, uGrassDefaultColor, 1.0 - scale); // Match the terrain
     vec3 color = mix(lowColor, uGrassDefaultColor, tipness);
 
-    // Sun shade (toon) - view-independent
+    // Sun shade - view-independent, passed to fragment for toon shading
     float sunShade = getSunShade(normal);
-    color = getToonShadeColor(color, sunShade);
 
     vColor = color;
+    vSunShade = sunShade;
 }

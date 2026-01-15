@@ -10,7 +10,8 @@ export default function PlayerMaterial()
         {
             uColor: { value: null },
             uLightnessSmoothness: { value: null },
-            uSunPosition: { value: null }
+            uSunPosition: { value: null },
+            uThreeToneTexture: { value: null }
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader

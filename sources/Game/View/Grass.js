@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 import Game from '@/Game.js'
 import View from '@/View/View.js'
+import Debug from '@/Debug/Debug.js'
 import State from '@/State/State.js'
 import GrassMaterial from './Materials/GrassMaterial.js'
 
@@ -11,6 +12,7 @@ export default class Grass
     {
         this.game = Game.getInstance()
         this.view = View.getInstance()
+        this.debug = Debug.getInstance()
         this.state = State.getInstance()
 
         this.time = this.state.time
@@ -30,6 +32,7 @@ export default class Grass
         this.setGeometry()
         this.setMaterial()
         this.setMesh()
+        this.setDebug()
     }
 
     setGeometry()
@@ -98,6 +101,20 @@ export default class Grass
         const engineChunks = this.state.chunks
         const engineTerrains = this.state.terrains
 
+        // Texture loader for toon textures
+        this.textureLoader = new THREE.TextureLoader()
+
+        // Toon shading configuration
+        this.toonConfig = {
+            texture: 'threeTone',
+            filter: 'Nearest'
+        }
+
+        // Load initial threeTone texture
+        this.toonTexture = this.textureLoader.load('/textures/threeTone.jpg')
+        this.toonTexture.minFilter = THREE.NearestFilter
+        this.toonTexture.magFilter = THREE.NearestFilter
+
         // this.material = new THREE.MeshBasicMaterial({ wireframe: true, color: 'green' })
         this.material = new GrassMaterial()
         this.material.uniforms.uTime.value = 0
@@ -115,6 +132,7 @@ export default class Grass
         this.material.uniforms.uTerrainDOffset.value = new THREE.Vector2()
         this.material.uniforms.uNoiseTexture.value = this.noiseTexture
         this.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
+        this.material.uniforms.uThreeToneTexture.value = this.toonTexture
         // this.material.wireframe = true
     }
 
@@ -193,5 +211,42 @@ export default class Grass
                 )
             }
         }
+    }
+
+    setDebug()
+    {
+        if(!this.debug.active)
+            return
+
+        const grassFolder = this.debug.ui.getFolder('view/grass')
+
+        // Toon shading controls
+        grassFolder
+            .add(this.toonConfig, 'texture', ['threeTone', 'fourTone', 'fiveTone'])
+            .name('Toon Texture')
+            .onChange(() => this.updateToonTexture())
+
+        grassFolder
+            .add(this.toonConfig, 'filter', ['Nearest', 'Linear'])
+            .name('Toon Filter')
+            .onChange(() => this.updateToonTexture())
+    }
+
+    updateToonTexture()
+    {
+        // Dispose old texture
+        if(this.toonTexture)
+            this.toonTexture.dispose()
+
+        // Load new texture
+        this.toonTexture = this.textureLoader.load(`/textures/${this.toonConfig.texture}.jpg`)
+
+        // Set filter
+        const filter = this.toonConfig.filter === 'Nearest' ? THREE.NearestFilter : THREE.LinearFilter
+        this.toonTexture.minFilter = filter
+        this.toonTexture.magFilter = filter
+
+        // Update material
+        this.material.uniforms.uThreeToneTexture.value = this.toonTexture
     }
 }
